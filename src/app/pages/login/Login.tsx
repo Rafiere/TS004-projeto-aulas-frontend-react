@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 export const Login = () => {
 
@@ -33,19 +33,39 @@ export const Login = () => {
 
     }, [email, senha]); //Quando qualquer uma das propriedades "email" ou "senha" forem alteradas, essa função será executada.
 
-    const handleEntrar = () => {
+    //O "useMemo()" serve para realizar um determinado cálculo e armazená-lo na
+    //memória, dessa forma, sempre que alterarmos um estado e o componente for
+    //renderizado novamente, esses calculos não serão feitos novamente, economizando
+    //processamento e memória, desde que o valor desse cálculo não seja alterado.
 
-        console.log(email);
-        console.log(senha);
-    }
+    //Quando o componente "Login" for executado, a arrow function que está sendo passada como
+    //argumento para o "useMemo()" será executada, após isso, o valor que essa função retornar
+    //será armazenado, e esse cálculo será refeito apenas se o valor dessa função for alterado.
+
+    const emailLength = useMemo(() => {
+        return email.length * 1000; //Simulação de cálculo complexo.
+    }, [email.length]); //Toda vez que o "email.length" for alterado, a arrow function será executada.
 
     //A cada alteração dos inputs, os eventos "onChange()" serão disparados, que contém a função "setEmail()" e "setSenha()". Essas funções retornarão o valor atual do input, dessa
     //forma, a cada alteração dos inputs, as variáveis "email" e "senha", que estão no atributo "value", serão modificadas
     //com o valor que está atualmente nesse elemento HTML.
 
+    //O "useCallback()" é um hook que serve para armazenar uma função em memória. Ele permite que uma
+    //determinada função não seja reutilizada todas as vezes que o componente for renderizado
+    //na tela.
+
+    //Isso economiza muitos recursos, assim, a função "handleEntrar" apenas será processada quando
+    //o email ou a senha forem alterados.
+    const handleEntrar = useCallback(() => {
+        console.log(email);
+        console.log(senha);
+    }, [email, senha])
+
     return (
         <div>
             <form>
+
+                <p>Quantidade de caracteres no email: {emailLength}</p>
 
                 <label>
                     <span>Email</span>
