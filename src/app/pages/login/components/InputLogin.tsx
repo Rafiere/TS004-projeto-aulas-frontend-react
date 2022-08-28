@@ -3,6 +3,8 @@
  * receber.
  */
 
+import React from "react";
+
 interface IInputLoginProps {
 
     label: string;
@@ -18,12 +20,13 @@ interface IInputLoginProps {
  * senha. 
  */
 
-export const InputLogin: React.FC<IInputLoginProps> = (props) => { //O "React.FC" indica que o "InputLogin" será um componente funcional do React que terá os atributos especificados na interface.
+export const InputLogin = React.forwardRef<HTMLInputElement, IInputLoginProps>((props, ref) => { //O "React.FC" indica que o "InputLogin" será um componente funcional do React que terá os atributos especificados na interface.
 
     return (
         <label>
             <span>{props.label}</span>
             <input
+            ref={ref}
             type={props.type} 
             value={props.value}
             onChange={e => props.onChange(e.target.value)} 
@@ -31,5 +34,4 @@ export const InputLogin: React.FC<IInputLoginProps> = (props) => { //O "React.FC
             ? props.onPressEnter && props.onPressEnter() : undefined} />
         </label>
     )
-
-}
+});
