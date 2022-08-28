@@ -3,7 +3,7 @@
  * páginas, componentes ou qualquer coisa de nossa aplicação.
  */
 
-import { createContext, useCallback } from "react";
+import { createContext, useCallback, useEffect, useState } from "react";
 
 interface IUsuarioLogadoContextData { //Tudo o que está dentro dessa interface será compartilhado por esse contexto.
     nomeDoUsuario: string;
@@ -17,6 +17,14 @@ interface IUsuarioLogadoProviderProps {
 }
 
 export const UsuarioLogadoProvider: React.FC<IUsuarioLogadoProviderProps> = ({ children }) => {
+
+    const [nome, setNome] = useState('');
+
+    useEffect(() => {
+        setTimeout(() => {
+            setNome('Lucas')
+        }, 1000);
+    });
 
     const handleLogout = useCallback(() => {
 
