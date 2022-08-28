@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 export const Login = () => {
 
@@ -61,6 +61,22 @@ export const Login = () => {
         console.log(senha);
     }, [email, senha])
 
+    //O hook "useRef()" permite o armazenamento de valores dentro de uma variável, e, quando esse
+    //componente for renderizado, o valor dessa variável não será alterado. Esse valor poderá ser acessado e
+    //alterado posteriormente, caso necessário.
+
+    //Exceto se o componente for destruído e reconstruído, o "useRef()" manterá esse determinado valor
+    //armazenado.
+
+    //Quando o componente "Login" for inicializado, o valor inicial dessa constante será nulo. O "HTMLInputElement" que está
+    //na tag "input" inserirá a referência desse input na constante "inputPasswordRef", assim, essa variável terá um determinado
+    //valor.
+    const inputPasswordRef = useRef<HTMLInputElement>(null);
+
+    //No exemplo abaixo, sempre que teclarmos "Enter" no input de email, o cursor do usuário focará na input de senha. Basicamente, o
+    //"useRef()" contém a referência ao elemento HTML do input da senha, assim, podemos armazenar essa referência e manipulá-la da
+    //forma desejada. Nesse exemplo, estamos utilizando essa referência para focarmos o cursor nela.
+
     return (
         <div>
             <form>
@@ -69,12 +85,12 @@ export const Login = () => {
 
                 <label>
                     <span>Email</span>
-                    <input value={email} onChange={e => setEmail(e.target.value)}/>
+                    <input value={email} onChange={e => setEmail(e.target.value)} onKeyDown={evento => evento.key === 'Enter' ? inputPasswordRef.current?.focus() : undefined}/>
                 </label>
 
                 <label>
                     <span>Senha</span>
-                    <input type="password" value={senha} onChange={e => setSenha(e.target.value)}/>
+                    <input type="password" value={senha} onChange={e => setSenha(e.target.value)} ref={inputPasswordRef}/>
                 </label>
 
                 <button type="button" onClick={handleEntrar}>
