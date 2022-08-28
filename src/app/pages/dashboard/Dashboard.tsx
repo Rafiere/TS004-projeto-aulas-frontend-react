@@ -1,5 +1,6 @@
-import { useRef } from 'react';
+import { useContext, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { UsuarioLogadoContext } from '../../shared/contexts';
 
 export const Dashboard = () => {
 
@@ -8,9 +9,13 @@ export const Dashboard = () => {
                                 //O "useRef()" é útil para isso, ou seja, quando desejamos obter um valor mas não vamos utilizá-lo para renderizar a página.
     })
 
+    const usuarioLogadoContext = useContext(UsuarioLogadoContext); //Esse hook permite o acesso a qualquer um dos atributos que estão nesse contexto.
+
     return (
         <div>
             <p>Dashboard</p>
+
+            <p>{usuarioLogadoContext.nomeDoUsuario}</p>
 
             <p>Contador: {counterRef.current.counter}</p>
 
