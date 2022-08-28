@@ -9,7 +9,7 @@ export const Dashboard = () => {
                                 //O "useRef()" é útil para isso, ou seja, quando desejamos obter um valor mas não vamos utilizá-lo para renderizar a página.
     })
 
-    const {nomeDoUsuario} = useUsuarioLogado(); //Esse hook permite o acesso a qualquer um dos atributos que estão nesse contexto.
+    const {nomeDoUsuario, logout } = useUsuarioLogado(); //Esse hook permite o acesso a qualquer um dos atributos que estão nesse contexto.
 
     return (
         <div>
@@ -20,6 +20,8 @@ export const Dashboard = () => {
             <p>Contador: {counterRef.current.counter}</p>
 
             <button onClick={() => counterRef.current.counter++}>Somar</button>
+            
+            <button onClick={logout}>Logout</button>
 
             <Link to="/entrar">Login</Link>
         </div>
