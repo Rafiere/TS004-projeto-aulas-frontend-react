@@ -5,8 +5,10 @@
 import React, { useCallback, useDebugValue, useState } from "react";
 
 interface IListItem { //Essa interface representará um item de nossa lista.
+    id: number;
     title: string; //É o que digitamos no input.
-    isSelected: boolean; //Se esse item está selecionado ou não.
+    isCompleted: boolean; //Se esse item está selecionado ou não.
+    
 }
 
 export const Dashboard = () => {
@@ -46,8 +48,9 @@ export const Dashboard = () => {
                 }
 
                 return [...listaAntiga, {
+                    id: listaAntiga.length,
                     title: novoValor,
-                    isSelected: false
+                    isCompleted: false
                 }]; //Estamos adicionando o novo elemento na lista antiga.
             });
         }
@@ -64,19 +67,19 @@ export const Dashboard = () => {
                 onKeyDown={handleInputKeyDown}
             />
 
-            <p>Quantidade de itens selecionados: {lista.filter((itemDeLista) => itemDeLista.isSelected).length}</p>
+            <p>Quantidade de itens selecionados: {lista.filter((itemDeLista) => itemDeLista.isCompleted).length}</p>
 
             <ul>
                 {lista.map((itemDeLista) => {
-                    return <li key={itemDeLista.title}>
+                    return <li key={itemDeLista.id}>
                     <input type="checkbox"
                            onChange={() => {
                                 setLista(listaAntiga => {
                                     return listaAntiga.map(itemDeListaAntigo => {
                                         
                                         const isNovoSelecionado = itemDeListaAntigo.title === itemDeLista.title 
-                                        ? !itemDeListaAntigo.isSelected 
-                                        : itemDeListaAntigo.isSelected;
+                                        ? !itemDeListaAntigo.isCompleted 
+                                        : itemDeListaAntigo.isCompleted;
                                         
                                         return {
                                             ...itemDeListaAntigo,
