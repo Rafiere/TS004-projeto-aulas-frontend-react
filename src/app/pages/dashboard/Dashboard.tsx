@@ -2,7 +2,12 @@
 // import { Link } from 'react-router-dom';
 // import { useUsuarioLogado } from '../../shared/hooks';
 
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useDebugValue, useState } from "react";
+
+interface IListItem { //Essa interface representará um item de nossa lista.
+    title: string; //É o que digitamos no input.
+    isSelected: boolean; //Se esse item está selecionado ou não.
+}
 
 export const Dashboard = () => {
 
@@ -18,7 +23,7 @@ export const Dashboard = () => {
     //Tudo que precisar de uma interação, ou seja, de uma modificação em nossa
     //interface, utilizaremos o "useState()".
 
-    const [lista, setLista] = useState<string[]>(['Teste1', 'Teste2', 'Teste3']); //Estamos passando três valores iniciais para essa lista.
+    const [lista, setLista] = useState<IListItem[]>([]); //Estamos passando três valores iniciais para essa lista.
 
     const handleInputKeyDown: React.KeyboardEventHandler<HTMLInputElement> = useCallback((evento) => { //Quando qualquer tecla for pressionada nesse input, essa função será ativada.
         if(evento.key === 'Enter'){
@@ -36,15 +41,20 @@ export const Dashboard = () => {
 
             setLista((listaAntiga) => {
 
-                if(listaAntiga.includes(novoValor)){ //Estamos impedindo que valores repetidos sejam adicionados na lista.
+                if(listaAntiga.some((itemDeLista) => itemDeLista.title === novoValor)){ //Estamos impedindo que valores repetidos sejam adicionados na lista.
                     return listaAntiga;
                 }
 
-                return [...listaAntiga, novoValor]; //Estamos adicionando o novo elemento na lista antiga.
+                return [...listaAntiga, {
+                    title: novoValor,
+                    isSelected: false
+                }]; //Estamos adicionando o novo elemento na lista antiga.
             });
         }
 
     }, [])
+
+    //RESOLVER BUG ABAIXO. VERIFICAR O QUE EU DIGITEI ERRADO E TERMINAR A AULA.
 
     return (
         <div>
@@ -54,9 +64,30 @@ export const Dashboard = () => {
                 onKeyDown={handleInputKeyDown}
             />
 
+            <p>Quantidade de itens selecionados: {lista.filter((itemDeLista) => itemDeLista.isSelected).length}</p>
+
             <ul>
-                {lista.map((value: string) => {
-                    return <li key={value}>{value}</li>;
+                {lista.map((itemDeLista) => {
+                    return <li key={itemDeLista.title}>
+                    <input type="checkbox"
+                           onChange={() => {
+                                setLista(listaAntiga => {
+                                    return listaAntiga.map(itemDeListaAntigo => {
+                                        
+                                        const isNovoSelecionado = itemDeListaAntigo.title === itemDeLista.title 
+                                        ? !itemDeListaAntigo.isSelected 
+                                        : itemDeListaAntigo.isSelected;
+                                        
+                                        return {
+                                            ...itemDeListaAntigo,
+                                            isSelected: isNovoSelecionado,
+                                        };
+                                    });
+                                });
+                           }}
+                           />
+                           {itemDeLista.title}
+                    </li>;
                 })}
             </ul>
 
