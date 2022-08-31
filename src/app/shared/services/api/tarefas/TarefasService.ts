@@ -61,7 +61,7 @@ const create = async(dataToCreate: Omit<ITarefa, 'id'>): Promise<ITarefa[] | Api
 
 };
 
-const updateById = async(id: string, dataToUpdate: ITarefa): Promise<ITarefa | ApiException> => {
+const updateById = async(id: number, dataToUpdate: ITarefa): Promise<ITarefa | ApiException> => {
 
     try {
 
@@ -75,7 +75,7 @@ const updateById = async(id: string, dataToUpdate: ITarefa): Promise<ITarefa | A
 
 };
 
-const deleteById = async(id: string): Promise<ITarefa[] | ApiException> => {
+const deleteById = async(id: number): Promise<ITarefa[] | ApiException> => {
 
     try {
 
