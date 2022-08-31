@@ -2,14 +2,9 @@
 // import { Link } from 'react-router-dom';
 // import { useUsuarioLogado } from '../../shared/hooks';
 
-import React, { useCallback, useDebugValue, useState } from "react";
-
-interface IListItem { //Essa interface representará um item de nossa lista.
-    id: number;
-    title: string; //É o que digitamos no input.
-    isCompleted: boolean; //Se esse item está selecionado ou não.
-    
-}
+import React, { useCallback, useDebugValue, useEffect, useState } from "react";
+import { ApiException } from "../../shared/services/api/ApiException";
+import { ITarefa, TarefasService } from "../../shared/services/api/tarefas/TarefasService";
 
 export const Dashboard = () => {
 
@@ -25,7 +20,22 @@ export const Dashboard = () => {
     //Tudo que precisar de uma interação, ou seja, de uma modificação em nossa
     //interface, utilizaremos o "useState()".
 
-    const [lista, setLista] = useState<IListItem[]>([]); //Estamos passando três valores iniciais para essa lista.
+    const [lista, setLista] = useState<ITarefa[]>([]); //Estamos passando três valores iniciais para essa lista.
+
+    useEffect(() => {
+
+        TarefasService.getAll().then((result) => { //O resultado será uma "ApiException" ou uma lista de tarefas.
+            
+            //Essa função será executada quando a consulta for finalizada, ou seja, quando a promise for resolvida.
+
+            if(result instanceof ApiException){ //Estamos tratando um possível erro.
+                alert(result.message)
+            }else{
+                setLista(result);
+            }
+
+        }); //O "then()" trata uma promise. O método "getAll()" devolverá uma promise pois ele é assíncrono.
+    }, [])
 
     const handleInputKeyDown: React.KeyboardEventHandler<HTMLInputElement> = useCallback((evento) => { //Quando qualquer tecla for pressionada nesse input, essa função será ativada.
         if(evento.key === 'Enter'){
@@ -41,17 +51,28 @@ export const Dashboard = () => {
             const novoValor = evento.currentTarget.value;
             evento.currentTarget.value = ''; //Estamos limpando o valor que foi digitado após atribuirmos esse valor em uma variável.
 
-            setLista((listaAntiga) => {
+            if(lista.some((itemDeLista) => itemDeLista.title === novoValor)){ //Estamos impedindo que valores repetidos sejam adicionados na lista.
+                return;
+            }
 
-                if(listaAntiga.some((itemDeLista) => itemDeLista.title === novoValor)){ //Estamos impedindo que valores repetidos sejam adicionados na lista.
-                    return listaAntiga;
+            TarefasService.create({ //Estamos criando uma tarefa em nosso banco de dados.
+                title: novoValor,
+                isCompleted: false
+            }).then((result) => {
+
+                if(result instanceof ApiException){
+                    
+                    alert(result.message)
+                } else {
+                    setLista((listaAntiga) => {
+        
+                        return [...listaAntiga, {
+                            id: listaAntiga.length,
+                            title: novoValor,
+                            isCompleted: false
+                        }]; //Estamos adicionando o novo elemento na lista antiga.
+                    });
                 }
-
-                return [...listaAntiga, {
-                    id: listaAntiga.length,
-                    title: novoValor,
-                    isCompleted: false
-                }]; //Estamos adicionando o novo elemento na lista antiga.
             });
         }
 
