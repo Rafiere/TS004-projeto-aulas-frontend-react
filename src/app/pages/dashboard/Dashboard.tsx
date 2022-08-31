@@ -37,6 +37,39 @@ export const Dashboard = () => {
         }); //O "then()" trata uma promise. O método "getAll()" devolverá uma promise pois ele é assíncrono.
     }, [])
 
+    const handleToggleComplete = useCallback((id: number) => { //Esse é o ID da tarefa que terá o status "isCompleted" alterado.
+
+        const tarefaQueSeraAtualizada = lista.find((tarefa) => tarefa.id === id)
+
+        if(!tarefaQueSeraAtualizada){ //Se a tarefa for "undefined", ou seja, não existir, não passaremos dados quebrados para o back-end.
+            return;
+        }
+
+        TarefasService.updateById(id, {
+            ...tarefaQueSeraAtualizada,
+            isCompleted: !tarefaQueSeraAtualizada.isCompleted
+        }).then((result) => {
+
+            if(result instanceof ApiException){
+                alert(result.message);
+            }else {
+
+                setLista(listaAntiga => { //Quando o banco de dados alterar um item de lista, atualizaremos o componente da lista para exibir o componente que foi atualizado ao invés do componente antigo.
+            
+                    return listaAntiga.map(itemDeListaAntigo => {
+                        
+                        if(itemDeListaAntigo.id === id){
+                            return result;
+                        }
+                        
+                        return itemDeListaAntigo;
+                    });
+                });
+            }
+        })
+
+    }, [lista]);
+
     const handleInputKeyDown: React.KeyboardEventHandler<HTMLInputElement> = useCallback((evento) => { //Quando qualquer tecla for pressionada nesse input, essa função será ativada.
         if(evento.key === 'Enter'){
          
@@ -94,20 +127,9 @@ export const Dashboard = () => {
                 {lista.map((itemDeLista) => {
                     return <li key={itemDeLista.id}>
                     <input type="checkbox"
-                           onChange={() => {
-                                setLista(listaAntiga => {
-                                    return listaAntiga.map(itemDeListaAntigo => {
-                                        
-                                        const isNovoSelecionado = itemDeListaAntigo.title === itemDeLista.title 
-                                        ? !itemDeListaAntigo.isCompleted 
-                                        : itemDeListaAntigo.isCompleted;
-                                        
-                                        return {
-                                            ...itemDeListaAntigo,
-                                            isCompleted: isNovoSelecionado,
-                                        };
-                                    });
-                                });
+                            checked={itemDeLista.isCompleted}
+                            onChange={() => {
+                            handleToggleComplete(itemDeLista.id);
                            }}
                            />
                            {itemDeLista.title}
