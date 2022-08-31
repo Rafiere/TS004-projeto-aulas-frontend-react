@@ -25,12 +25,12 @@ export const Dashboard = () => {
     useEffect(() => {
 
         TarefasService.getAll().then((result) => { //O resultado será uma "ApiException" ou uma lista de tarefas.
-            
+
             //Essa função será executada quando a consulta for finalizada, ou seja, quando a promise for resolvida.
 
-            if(result instanceof ApiException){ //Estamos tratando um possível erro.
+            if (result instanceof ApiException) { //Estamos tratando um possível erro.
                 alert(result.message)
-            }else{
+            } else {
                 setLista(result);
             }
 
@@ -41,7 +41,7 @@ export const Dashboard = () => {
 
         const tarefaQueSeraAtualizada = lista.find((tarefa) => tarefa.id === id)
 
-        if(!tarefaQueSeraAtualizada){ //Se a tarefa for "undefined", ou seja, não existir, não passaremos dados quebrados para o back-end.
+        if (!tarefaQueSeraAtualizada) { //Se a tarefa for "undefined", ou seja, não existir, não passaremos dados quebrados para o back-end.
             return;
         }
 
@@ -50,18 +50,18 @@ export const Dashboard = () => {
             isCompleted: !tarefaQueSeraAtualizada.isCompleted
         }).then((result) => {
 
-            if(result instanceof ApiException){
+            if (result instanceof ApiException) {
                 alert(result.message);
-            }else {
+            } else {
 
                 setLista(listaAntiga => { //Quando o banco de dados alterar um item de lista, atualizaremos o componente da lista para exibir o componente que foi atualizado ao invés do componente antigo.
-            
+
                     return listaAntiga.map(itemDeListaAntigo => {
-                        
-                        if(itemDeListaAntigo.id === id){
+
+                        if (itemDeListaAntigo.id === id) {
                             return result;
                         }
-                        
+
                         return itemDeListaAntigo;
                     });
                 });
@@ -70,21 +70,39 @@ export const Dashboard = () => {
 
     }, [lista]);
 
+    const handleDelete = useCallback((id: number) => { //Esse é o ID da tarefa que terá o status "isCompleted" alterado.
+
+        TarefasService.deleteById(id)
+            .then((result) => {
+
+                if (result instanceof ApiException) {
+                    alert(result.message);
+                } else {
+
+                    setLista(listaAntiga => { //Quando o banco de dados alterar um item de lista, atualizaremos o componente da lista para exibir o componente que foi atualizado ao invés do componente antigo.
+
+                        return listaAntiga.filter(itemDeListaAntigo => itemDeListaAntigo.id !== id);
+                    });
+                }
+            })
+
+    }, [lista]);
+
     const handleInputKeyDown: React.KeyboardEventHandler<HTMLInputElement> = useCallback((evento) => { //Quando qualquer tecla for pressionada nesse input, essa função será ativada.
-        if(evento.key === 'Enter'){
-         
-            if(evento.currentTarget.value.length === 0){ //Se esse valor for igual a zero, isso significa que o usuário não digitou nada no input.
+        if (evento.key === 'Enter') {
+
+            if (evento.currentTarget.value.length === 0) { //Se esse valor for igual a zero, isso significa que o usuário não digitou nada no input.
                 return;
             }
 
-            if(evento.currentTarget.value.trim().length === 0){ //Vamos verificar se, sem os espaços no input do usuário, a quantidade de caracteres no input será maior que zero. Se for igual a zero, isso significa que o usuário digitou apenas espaços em branco, e o software não pode permitir isso.
+            if (evento.currentTarget.value.trim().length === 0) { //Vamos verificar se, sem os espaços no input do usuário, a quantidade de caracteres no input será maior que zero. Se for igual a zero, isso significa que o usuário digitou apenas espaços em branco, e o software não pode permitir isso.
                 return;
             }
 
             const novoValor = evento.currentTarget.value;
             evento.currentTarget.value = ''; //Estamos limpando o valor que foi digitado após atribuirmos esse valor em uma variável.
 
-            if(lista.some((itemDeLista) => itemDeLista.title === novoValor)){ //Estamos impedindo que valores repetidos sejam adicionados na lista.
+            if (lista.some((itemDeLista) => itemDeLista.title === novoValor)) { //Estamos impedindo que valores repetidos sejam adicionados na lista.
                 return;
             }
 
@@ -93,12 +111,12 @@ export const Dashboard = () => {
                 isCompleted: false
             }).then((result) => {
 
-                if(result instanceof ApiException){
-                    
+                if (result instanceof ApiException) {
+
                     alert(result.message)
                 } else {
                     setLista((listaAntiga) => {
-        
+
                         return [...listaAntiga, {
                             id: listaAntiga.length,
                             title: novoValor,
@@ -126,13 +144,17 @@ export const Dashboard = () => {
             <ul>
                 {lista.map((itemDeLista) => {
                     return <li key={itemDeLista.id}>
-                    <input type="checkbox"
+                        <input type="checkbox"
                             checked={itemDeLista.isCompleted}
                             onChange={() => {
-                            handleToggleComplete(itemDeLista.id);
-                           }}
-                           />
-                           {itemDeLista.title}
+                                handleToggleComplete(itemDeLista.id);
+                            }}
+                        />
+                        {itemDeLista.title}
+
+                        <button onClick={() => handleDelete(itemDeLista.id)}>
+                           Apagar 
+                        </button>
                     </li>;
                 })}
             </ul>
