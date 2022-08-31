@@ -104,7 +104,7 @@ export const Dashboard = () => {
                                         
                                         return {
                                             ...itemDeListaAntigo,
-                                            isSelected: isNovoSelecionado,
+                                            isCompleted: isNovoSelecionado,
                                         };
                                     });
                                 });
