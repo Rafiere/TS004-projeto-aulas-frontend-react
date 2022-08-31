@@ -13,8 +13,10 @@ import { ApiException } from "../ApiException";
  * do back-end.
  */
 
-interface ITarefa {
-
+export interface ITarefa { //Essa interface representará um item de nossa lista.
+    id: number;
+    title: string;
+    isCompleted: boolean;
 }
 
 const getAll = async (): Promise<ITarefa[] | ApiException> => { //Sempre devemos passar o "async" no método para utilizarmos o "await".
@@ -31,13 +33,13 @@ const getAll = async (): Promise<ITarefa[] | ApiException> => { //Sempre devemos
     
 };
 
-const getById = async(id: number): Promise<undefined | ApiException> => { //Será retornado apenas uma única tarefa ou um erro de API.
+const getById = async(id: number): Promise<ITarefa | ApiException> => { //Será retornado apenas uma única tarefa ou um erro de API.
 
     try {
 
         const { data } = await Api().post(`/tarefas/${id}`); //Esse endpoint obterá uma lista de tarefas. Como estamos informando a URL base no "ApiConfig", basta informarmos o endpoint dessa URL base.
 
-        return undefined;
+        return data;
         
     }catch(error: any){
         return new ApiException(error.message || 'Erro ao consultar a API.')
